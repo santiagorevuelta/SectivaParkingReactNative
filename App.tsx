@@ -25,7 +25,7 @@ function App(): JSX.Element {
   return (
     <NavigationContainer theme={theme}>
       <Stack.Navigator
-        initialRouteName="LoginScreen"
+        initialRouteName="Dashboard"
         screenOptions={{
           headerShown: false,
         }}>
