@@ -17,8 +17,8 @@ const Selector = ({
   valueSelected = [],
   list = [],
   search,
-  id_label,
-  value_label,
+  id_label = 'key',
+  value_label = 'value',
   styleList = null,
   returnPress = false,
   multiple = false,
@@ -30,7 +30,11 @@ const Selector = ({
 
   useEffect(() => {
     if (!initial) {
-      onPress(set ? value[0] : value);
+      if (set) {
+        onPress(value[0]);
+      } else {
+        onPress(value || []);
+      }
     }
     setInitial(false);
   }, [value]);

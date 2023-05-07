@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {TouchableOpacity, StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {TouchableOpacity, StyleSheet, View, Dimensions} from 'react-native';
 import {Text} from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
@@ -7,12 +7,17 @@ import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import {theme} from '../core/theme';
 import {petition} from '../core/promises';
-import { ccValidator, passwordValidator } from "../helpers/inputsValidator";
+import {ccValidator, passwordValidator} from '../helpers/inputsValidator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({navigation}) {
   const [cc, setCc] = useState({value: '', error: ''});
   const [password, setPassword] = useState({value: '', error: ''});
   const [load, setLoad] = useState(false);
+  const [splash, setSplash] = useState(true);
+  const [loginOk, setLoginOk] = useState(false);
+  const {width, height} = Dimensions.get('window');
+
   const onLoginPressed = async () => {
     setLoad(true);
     const ccError = ccValidator(cc.value);
@@ -20,7 +25,7 @@ export default function LoginScreen({navigation}) {
     if (ccError || passwordError) {
       setCc({...cc, error: ccError});
       setPassword({...password, error: passwordError});
-      setLoad(false)
+      setLoad(false);
       return;
     }
     let res = await petition('login', 'auth', 'POST', {
@@ -28,6 +33,7 @@ export default function LoginScreen({navigation}) {
       password: password.value,
     });
     if (res.data.status) {
+      await AsyncStorage.setItem('login', 'Ok');
       let newVar = {user: res.data.data};
       navigation.reset({
         index: 0,
@@ -37,7 +43,29 @@ export default function LoginScreen({navigation}) {
     setLoad(false);
   };
 
-  return (
+  useEffect(() => {
+    async function init() {
+      let res = await AsyncStorage.getItem('login');
+      if (res === 'Ok') {
+        setLoginOk(true);
+      }
+    }
+    setTimeout(() => {
+      setSplash(false);
+    }, 3000);
+    init().then();
+  }, []);
+
+  useEffect(() => {
+    if (!splash && loginOk) {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Dashboard'}],
+      });
+    }
+  }, [splash, loginOk]);
+
+  return !splash ? (
     <Background>
       <Logo />
       <TextInput
@@ -78,6 +106,17 @@ export default function LoginScreen({navigation}) {
         </TouchableOpacity>
       </View>
     </Background>
+  ) : (
+    <View
+      style={{
+        width,
+        height,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <Logo />
+    </View>
   );
 }
 

@@ -1,27 +1,48 @@
 import * as React from 'react';
-import {BottomNavigation, Text} from 'react-native-paper';
-import {useState} from 'react';
+import {BottomNavigation, Text, Button} from 'react-native-paper';
 import {SafeAreaView, View} from 'react-native';
 import CrearCarScreen from './CrearCarScreen';
 import ReservaScreen from './ReservaScreen';
 import PayScreen from './PayScreen';
 import {WebView} from 'react-native-webview';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
 
-const CuentaRoute = () => (
-  <SafeAreaView>
-    <Text>Notifications</Text>
-  </SafeAreaView>
-);
+const CuentaRoute = () => {
+  const navigation = useNavigation();
+  return (
+    <SafeAreaView>
+      <Button
+        icon="account"
+        mode="contained"
+        onPress={async () => {
+          await AsyncStorage.removeItem('login');
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'LoginScreen'}],
+          });
+        }}>
+        Cerrar sesion
+      </Button>
+    </SafeAreaView>
+  );
+};
 
 const HomeRoute = () => (
   <SafeAreaView>
-    <Text style={{textAlign: 'center'}}>Encuentra tu parqueadero</Text>
-    <View style={{width: '100%', height: '90%'}}>
+    <Text
+      style={{
+        textAlign: 'center',
+        fontSize: 24,
+        fontWeight: 'bold',
+      }}>
+      Encuentra tu parqueadero
+    </Text>
+    <View style={{width: '100%', height: '95%'}}>
       <WebView
         source={{
           uri: 'https://www.google.com/maps/@6.279967,-75.5858882,15z',
         }}
-        style={{marginTop: 20, backgroundColor: 'red'}}
       />
     </View>
   </SafeAreaView>

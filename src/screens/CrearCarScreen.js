@@ -1,33 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from 'react';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import {SegmentedButtons, DataTable} from 'react-native-paper';
 import SelectSimple from '../components/SeletSimple/SelectSimple';
-import {View} from 'react-native';
+import {SafeAreaView, View, Dimensions} from 'react-native';
 
 export default function CrearCarScreen({navigation}) {
   const [value, setValue] = React.useState('');
   const onSignUpPressed = async () => {};
+  const {width} = Dimensions.get('window');
 
   return (
     <Background>
-      <SegmentedButtons
-        value={value}
-        onValueChange={setValue}
-        buttons={[
-          {
-            value: '1',
-            label: 'Mis Vehiculos',
-          },
-          {
-            value: '2',
-            label: 'Registrar',
-          },
-        ]}
-      />
-      {value === '1' && <VerVehiculos />}
-      {value === '2' && <Registrar />}
+      <SafeAreaView style={{width: width - 40}}>
+        <SegmentedButtons
+          value={value}
+          onValueChange={setValue}
+          buttons={[
+            {
+              value: '1',
+              label: 'Mis Vehiculos',
+            },
+            {
+              value: '2',
+              label: 'Registrar',
+            },
+          ]}
+        />
+        {value === '1' && <VerVehiculos />}
+        {value === '2' && <Registrar />}
+      </SafeAreaView>
     </Background>
   );
 }
