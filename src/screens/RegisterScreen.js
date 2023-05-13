@@ -135,23 +135,22 @@ export default function RegisterScreen({navigation}) {
         style={{marginTop: 24}}>
         Regístrate
       </Button>
-      <View style={styles.row}>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 4,
+        }}>
         <Text>¿Ya tiene una cuenta? </Text>
         <TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
-          <Text style={styles.link}>Iniciar sesión</Text>
+          <Text
+            style={{
+              fontWeight: 'bold',
+              color: theme.colors.primary,
+            }}>
+            Iniciar sesión
+          </Text>
         </TouchableOpacity>
       </View>
     </Background>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    marginTop: 4,
-  },
-  link: {
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-  },
-});
