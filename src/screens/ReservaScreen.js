@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ReservaScreen({navigation}) {
   const [table, setTable] = useState([]);
-  const [value, setValue] = React.useState('');
+  const [value, setValue] = React.useState('1');
   const {width} = Dimensions.get('window');
 
   useEffect(() => {

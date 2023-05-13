@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, StyleSheet, View, Dimensions} from 'react-native';
-import {Text} from 'react-native-paper';
+import { Snackbar, Text } from "react-native-paper";
 import Background from '../components/Background';
 import Logo from '../components/Logo';
 import Button from '../components/Button';
@@ -17,6 +17,11 @@ export default function LoginScreen({navigation}) {
   const [splash, setSplash] = useState(true);
   const [loginOk, setLoginOk] = useState(false);
   const {width, height} = Dimensions.get('window');
+  const [snackbar, setSnackbar] = React.useState({
+    active: false,
+    msg: '',
+  });
+  const onDismissSnackBar = () => setSnackbar({...snackbar, active: false});
 
   const onLoginPressed = async () => {
     setLoad(true);
@@ -32,6 +37,7 @@ export default function LoginScreen({navigation}) {
       identifier: cc.value,
       password: password.value,
     });
+    setSnackbar({msg: res.data.msg, active: true});
     if (res.data.status) {
       await AsyncStorage.setItem('login', 'Ok');
       let newVar = {user: res.data.data};
@@ -67,6 +73,16 @@ export default function LoginScreen({navigation}) {
 
   return !splash ? (
     <Background>
+      <Snackbar
+        wrapperStyle={{top: '10%'}}
+        visible={snackbar.active}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: 'Close',
+          onPress: () => {},
+        }}>
+        {snackbar.msg}
+      </Snackbar>
       <Logo />
       <TextInput
         label="Identificador"

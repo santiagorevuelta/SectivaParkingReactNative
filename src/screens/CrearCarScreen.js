@@ -7,8 +7,7 @@ import SelectSimple from '../components/SeletSimple/SelectSimple';
 import {SafeAreaView, View, Dimensions} from 'react-native';
 
 export default function CrearCarScreen({navigation}) {
-  const [value, setValue] = React.useState('');
-  const onSignUpPressed = async () => {};
+  const [value, setValue] = React.useState('1');
   const {width} = Dimensions.get('window');
 
   return (
@@ -82,16 +81,49 @@ const VerVehiculos = props => {
 };
 
 const Registrar = props => {
+
+  const [tipo, setTipo] = useState('');
+  const [marca, setMarca] = useState('');
+  const onSignUpPressed = async () => {};
+  const [listas, setListas] = useState({
+    marca: [
+      {key: '1', value: 'Marca 1'},
+      {key: '2', value: 'Marca 2'},
+      {key: '3', value: 'Marca 3'},
+    ],
+    placa: [
+      {key: '1', value: 'FJE124'},
+      {key: '2', value: 'UEG453'},
+      {key: '3', value: 'OHO444'},
+    ],
+  });
+
   return (
     <>
-      <SelectSimple label="Tipo vehiculo" />
-      <SelectSimple label="Marca" />
+      <SelectSimple
+        list={listas.placa}
+        label="Tipo vehiculo"
+        set={true}
+        valueSelected={tipo}
+        onPress={value => {
+          setTipo(value);
+        }}
+      />
+      <SelectSimple
+        list={listas.marca}
+        label="Marca"
+        valueSelected={marca}
+        set={true}
+        onPress={value => {
+          setMarca(value);
+        }}
+      />
       <TextInput label="Placa" returnKeyType="next" />
       <TextInput label="Modelo" returnKeyType="next" />
       <TextInput label="Color" returnKeyType="next" />
       <Button
         mode="contained"
-        onPress={props.onSignUpPressed}
+        onPress={onSignUpPressed}
         style={{marginTop: 24}}>
         Regístrar
       </Button>

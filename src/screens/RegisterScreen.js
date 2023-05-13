@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import {Text} from 'react-native-paper';
+import {Snackbar, Text} from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
 import Button from '../components/Button';
@@ -23,6 +23,11 @@ export default function RegisterScreen({navigation}) {
   const [cc, setCc] = useState({value: '', error: ''});
   const [password, setPassword] = useState({value: '', error: ''});
   const [load, setLoad] = useState(false);
+  const [snackbar, setSnackbar] = React.useState({
+    active: false,
+    msg: '',
+  });
+  const onDismissSnackBar = () => setSnackbar({...snackbar, active: false});
 
   const onSignUpPressed = async () => {
     setLoad(true);
@@ -49,6 +54,8 @@ export default function RegisterScreen({navigation}) {
     };
 
     let res = await petition('login', 'create', 'POST', data);
+
+    setSnackbar({msg: res.data.msg, active: true});
     if (res.data.status) {
       setTimeout(() => {
         navigation.reset({
@@ -62,6 +69,16 @@ export default function RegisterScreen({navigation}) {
 
   return (
     <Background>
+      <Snackbar
+        wrapperStyle={{top: '10%'}}
+        visible={snackbar.active}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: 'Close',
+          onPress: () => {},
+        }}>
+        {snackbar.msg}
+      </Snackbar>
       <BackButton goBack={navigation.goBack} />
       <Logo />
       <TextInput
