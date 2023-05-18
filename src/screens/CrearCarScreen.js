@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { Fragment, useEffect, useState } from "react";
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
-import {SegmentedButtons, DataTable} from 'react-native-paper';
+import { SegmentedButtons, DataTable, Text } from "react-native-paper";
 import SelectSimple from '../components/SeletSimple/SelectSimple';
 import {SafeAreaView, View, Dimensions} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -75,9 +75,9 @@ const VerVehiculos = ({table}) => {
         ))}
         <DataTable.Pagination
           page={page}
-          numberOfPages={3}
+          numberOfPages={table.length}
           onPageChange={page => setPage(page)}
-          label="1-2 of 6"
+          label={`1-2 of ${table.length}`}
           optionsPerPage={optionsPerPage}
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
@@ -136,10 +136,15 @@ const Registrar = ({table, setTable, setValue}) => {
   };
 
   return (
-    <>
+    <Fragment>
+      <Text
+        variant="labelSmall"
+        style={{textAlign: 'center', fontWeight: 'bold'}}>
+        Los campos marcados con asterisco son obligatorios
+      </Text>
       <SelectSimple
         list={listas.tipo}
-        label="Tipo vehiculo"
+        label="Tipo vehiculo (*)"
         set={true}
         valueSelected={tipo}
         onPress={value => {
@@ -148,7 +153,7 @@ const Registrar = ({table, setTable, setValue}) => {
       />
       <SelectSimple
         list={listas.marca}
-        label="Marca (obligatorio)"
+        label="Marca (*)"
         valueSelected={marca}
         set={true}
         onPress={value => {
@@ -156,7 +161,7 @@ const Registrar = ({table, setTable, setValue}) => {
         }}
       />
       <TextInput
-        label="Placa (obligatorio)"
+        label="Placa (*)"
         returnKeyType="next"
         value={placa}
         onChangeText={e => {
@@ -167,7 +172,7 @@ const Registrar = ({table, setTable, setValue}) => {
         }}
       />
       <TextInput
-        label="Modelo (obligatorio)"
+        label="Modelo (*)"
         returnKeyType="next"
         value={modelo}
         onChangeText={e => {
@@ -191,6 +196,6 @@ const Registrar = ({table, setTable, setValue}) => {
           Regístrar
         </Button>
       )}
-    </>
+    </Fragment>
   );
 };
