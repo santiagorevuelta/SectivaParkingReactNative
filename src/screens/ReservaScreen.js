@@ -1,15 +1,33 @@
-import React, {useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
-import {SegmentedButtons, DataTable, Snackbar} from 'react-native-paper';
+import {
+  SegmentedButtons,
+  DataTable,
+  Snackbar,
+  Button as Buttonn,
+  Portal,
+  Dialog,
+  Text,
+} from 'react-native-paper';
 import SelectSimple from '../components/SeletSimple/SelectSimple';
-import {Dimensions, SafeAreaView, ScrollView, View} from 'react-native';
+import {BottomNavigation} from 'react-native-paper';
+import {
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  View,
+  ImageBackground,
+  Pressable,
+} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {theme} from '../core/theme';
 import Background from '../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ReservaScreen({navigation}) {
+const navigation = BottomNavigation;
+
+export default function ReservaScreen() {
   const [table, setTable] = useState([]);
   const [value, setValue] = React.useState('1');
   const {width} = Dimensions.get('window');
@@ -40,7 +58,7 @@ export default function ReservaScreen({navigation}) {
             },
           ]}
         />
-        {value === '1' && <VerReservas table={table} />}
+        {value === '1' && <VerReservas table={table} navigation={navigation} />}
         {value === '2' && (
           <Registrar table={table} setTable={setTable} setValue={setValue} />
         )}
@@ -53,13 +71,47 @@ const optionsPerPage = [1];
 const VerReservas = ({table}) => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(optionsPerPage[0]);
+  const [visible, setVisible] = React.useState(false);
 
   useEffect(() => {
     setPage(0);
   }, [itemsPerPage]);
 
+  const showDialog = () => setVisible(true);
+  const hideDialog = () => setVisible(false);
+
   return (
-    <>
+    <Fragment>
+      <Portal>
+        <Dialog visible={visible} onDismiss={hideDialog}>
+          <Dialog.Title>Selecciona método de pago</Dialog.Title>
+          <Dialog.Content>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+              <Pressable onPress={() => hideDialog()}>
+                <ImageBackground
+                  source={{
+                    uri: 'https://onac.org.co/wp-content/uploads/2021/06/Boton_PSE-01.png',
+                  }}
+                  style={{width: 100, height: 100}}
+                />
+              </Pressable>
+              <Pressable onPress={() => hideDialog()}>
+                <ImageBackground
+                  source={{
+                    uri: 'https://insolita.pe/wp-content/uploads/tarjetas-izipay.png',
+                  }}
+                  resizeMode={'contain'}
+                  style={{width: 100, height: 100}}
+                />
+              </Pressable>
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Buttonn onPress={hideDialog}>Cancelar</Buttonn>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
       <DataTable>
         <DataTable.Header>
           <DataTable.Title>Placa</DataTable.Title>
@@ -76,6 +128,7 @@ const VerReservas = ({table}) => {
               <MaterialIcons
                 name={'payment'}
                 size={22}
+                onPress={() => showDialog()}
                 color={theme.colors.primary}
               />
             </DataTable.Cell>
@@ -94,7 +147,7 @@ const VerReservas = ({table}) => {
           optionsLabel={'Rows per page'}
         />
       </DataTable>
-    </>
+    </Fragment>
   );
 };
 
@@ -109,7 +162,6 @@ const Registrar = ({table, setTable, setValue}) => {
   const [horaFin, setHoraFin] = useState('');
 
   const [visible, setVisible] = React.useState(false);
-  const onToggleSnackBar = () => setVisible(!visible);
   const onDismissSnackBar = () => setVisible(false);
 
   const [listas, setListas] = useState({
@@ -125,12 +177,17 @@ const Registrar = ({table, setTable, setValue}) => {
       {key: '1', value: '01'},
       {key: '2', value: '02'},
     ],
-    placa: [
-      {key: '1', value: 'FJE124'},
-      {key: '2', value: 'UEG453'},
-      {key: '3', value: 'OHO444'},
-    ],
+    placa: [],
   });
+
+  useEffect(() => {
+    async function init() {
+      let table_data = (await AsyncStorage.getItem('vehiculos')) || '[]';
+      table_data = JSON.parse(table_data);
+      setListas({...listas, placa: table_data});
+    }
+    init().then();
+  }, [table]);
 
   const onSendPressed = async () => {
     let id = listas.placa.filter(e => {
@@ -138,7 +195,7 @@ const Registrar = ({table, setTable, setValue}) => {
     })[0];
     let newReg = [
       ...table,
-      {placa: id.value, fechaIni, horaIni, fechaFin, horaFin},
+      {placa: id.placa, fechaIni, horaIni, fechaFin, horaFin},
     ];
     setTable(newReg);
     setValue('1');
@@ -147,6 +204,11 @@ const Registrar = ({table, setTable, setValue}) => {
 
   return (
     <ScrollView style={{marginBottom: 20}}>
+      <Text
+        variant="labelSmall"
+        style={{textAlign: 'center', fontWeight: 'bold'}}>
+        Los campos marcados con asterisco son obligatorios
+      </Text>
       <Snackbar
         visible={visible}
         onDismiss={onDismissSnackBar}
@@ -161,7 +223,7 @@ const Registrar = ({table, setTable, setValue}) => {
       <SelectSimple
         list={listas.parqueadero}
         set={true}
-        label="Parqueadero"
+        label="Parqueadero (*)"
         valueSelected={parquedero}
         onPress={value => {
           setParquedero(value);
@@ -170,7 +232,7 @@ const Registrar = ({table, setTable, setValue}) => {
       <SelectSimple
         list={listas.piso}
         set={true}
-        label="Piso"
+        label="Piso (*)"
         valueSelected={piso}
         onPress={value => {
           setPiso(value);
@@ -179,7 +241,7 @@ const Registrar = ({table, setTable, setValue}) => {
       <SelectSimple
         list={listas.celda}
         set={true}
-        label="Celda"
+        label="Celda (*)"
         valueSelected={celda}
         onPress={value => {
           setCelda(value);
@@ -189,10 +251,11 @@ const Registrar = ({table, setTable, setValue}) => {
         list={listas.placa}
         set={true}
         valueSelected={placa}
+        value_label={'placa'}
         onPress={value => {
           setPlaca(value);
         }}
-        label="Placa"
+        label="Placa (*)"
       />
       <View
         style={{
@@ -203,7 +266,7 @@ const Registrar = ({table, setTable, setValue}) => {
           type={'date'}
           styleContent={{width: '50%'}}
           style={{width: '90%'}}
-          label="Fecha inicio"
+          label="Fecha inicio (*)"
           value={fechaIni}
           onChangeText={e => {
             setFechaIni(e);
@@ -213,7 +276,7 @@ const Registrar = ({table, setTable, setValue}) => {
           type={'time'}
           styleContent={{width: '50%'}}
           style={{width: '100%'}}
-          label="Hora inicio"
+          label="Hora inicio (*)"
           value={horaIni}
           onChangeText={e => {
             setHoraIni(e);
@@ -229,7 +292,7 @@ const Registrar = ({table, setTable, setValue}) => {
           type={'date'}
           styleContent={{width: '50%'}}
           style={{width: '90%'}}
-          label="Fecha fin"
+          label="Fecha fin (*)"
           value={fechaFin}
           onChangeText={e => {
             setFechaFin(e);
@@ -239,16 +302,28 @@ const Registrar = ({table, setTable, setValue}) => {
           type={'time'}
           styleContent={{width: '50%'}}
           style={{width: '100%'}}
-          label="Hora fin"
+          label="Hora fin (*)"
           value={horaFin}
           onChangeText={e => {
             setHoraFin(e);
           }}
         />
       </View>
-      <Button mode="contained" onPress={onSendPressed} style={{marginTop: 24}}>
-        Regístrar
-      </Button>
+      {parquedero !== '' &&
+        piso !== '' &&
+        celda !== '' &&
+        placa !== '' &&
+        fechaIni !== '' &&
+        horaIni !== '' &&
+        fechaFin !== '' &&
+        horaFin !== '' && (
+          <Button
+            mode="contained"
+            onPress={onSendPressed}
+            style={{marginTop: 24}}>
+            Regístrar
+          </Button>
+        )}
     </ScrollView>
   );
 };
