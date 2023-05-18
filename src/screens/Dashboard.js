@@ -41,7 +41,7 @@ const HomeRoute = () => (
     <View style={{width: '100%', height: '95%'}}>
       <WebView
         source={{
-          uri: 'https://www.google.com/maps/@6.279967,-75.5858882,15z',
+          uri: 'https://www.google.com/maps/search/parqueaderos/@6.3401123,-75.5654812,15z/data=!3m1!4b1',
         }}
       />
     </View>
