@@ -1,48 +1,47 @@
-import React, { useState } from 'react'
-import Background from '../components/Background'
-import BackButton from '../components/BackButton'
-import Logo from '../components/Logo'
-import Header from '../components/Header'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import { emailValidator } from "../helpers/inputsValidator";
+import React, {useState} from 'react';
+import Background from '../components/Background';
+import BackButton from '../components/BackButton';
+import Logo from '../components/Logo';
+import Header from '../components/Header';
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
+import {emailValidator} from '../helpers/inputsValidator';
 
-export default function ResetPasswordScreen({ navigation }) {
-  const [email, setEmail] = useState({ value: '', error: '' })
+export default function ResetPasswordScreen({navigation}) {
+  const [email, setEmail] = useState({value: '', error: ''});
 
   const sendResetPasswordEmail = () => {
-    const emailError = emailValidator(email.value)
+    const emailError = emailValidator(email.value);
     if (emailError) {
-      setEmail({ ...email, error: emailError })
-      return
+      setEmail({...email, error: emailError});
+      return;
     }
-    navigation.navigate('LoginScreen')
-  }
+    navigation.navigate('LoginScreen');
+  };
 
   return (
     <Background>
       <BackButton goBack={navigation.goBack} />
       <Logo />
       <TextInput
-        label="E-mail address"
+        label="Correo"
         returnKeyType="done"
         value={email.value}
-        onChangeText={(text) => setEmail({ value: text, error: '' })}
+        onChangeText={text => setEmail({value: text, error: ''})}
         error={!!email.error}
         errorText={email.error}
         autoCapitalize="none"
         autoCompleteType="email"
         textContentType="emailAddress"
         keyboardType="email-address"
-        description="You will receive email with password reset link."
+        description="Recibirá un correo electrónico con un enlace para restablecer la contraseña."
       />
       <Button
         mode="contained"
         onPress={sendResetPasswordEmail}
-        style={{ marginTop: 16 }}
-      >
-        Send Instructions
+        style={{marginTop: 16}}>
+        Enviar instrucciones
       </Button>
     </Background>
-  )
+  );
 }
